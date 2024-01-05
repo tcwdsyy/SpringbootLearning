@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 
 
 @Controller
@@ -28,17 +29,33 @@ public class UserController {
     TokenMapper tokenMapper;
 
     @RequestMapping("/home")
-    public ModelAndView show(HttpServletRequest req){
-        System.out.println("主页");
+    public ModelAndView show(HttpServletRequest req,
+                             HttpServletResponse resp) throws ParseException {
+        System.out.println("主页:");
         ModelAndView mav = new ModelAndView();
+
         // 获取token的cookie
         Cookie cookie = CookieUtils.getCookie(req.getCookies(),"token");
         String tokenVal = cookie.getValue();
         Token token = TokenUtils.verify(tokenVal);
+
         if(token!=null){
-            mav.setViewName("home");
-            mav.addObject("id",token.getUserID());
+            // 查看数据库token是否匹配
+            Token loginToken = tokenMapper.selectOne(token);
+            if (loginToken!=null){
+                // 更新token
+                Token newToken = TokenUtils.createToken(loginToken.getUserID());
+                // 存入数据库
+                tokenMapper.insert(newToken);
+                // 存入客户端Cookie
+                Cookie newCookie = new Cookie("token", newToken.getToken());
+                resp.addCookie(newCookie);
+
+                mav.setViewName("home");
+                mav.addObject("id",loginToken.getUserID());
+            }
         }else{
+            System.out.println("token不正确");
             mav.setViewName("redirect:loginForm");
         }
         return mav;
@@ -67,8 +84,7 @@ public class UserController {
         // 存入token
         if(loginUser!=null){
             // 创建token
-            String tokenValue = TokenUtils.createToken(loginUser.getId());
-            Token token = new Token(loginUser.getId(), tokenValue);
+            Token token = TokenUtils.createToken(loginUser.getId());
             // 存入数据库
             tokenMapper.insert(token);
             // 存入客户端Cookie
