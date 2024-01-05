@@ -5,6 +5,7 @@ import com.syy.springbootlearning.entity.User;
 import com.syy.springbootlearning.mapper.TokenMapper;
 import com.syy.springbootlearning.mapper.UserMapper;
 import com.syy.springbootlearning.utils.CookieUtils;
+import com.syy.springbootlearning.utils.TokenUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,37 +13,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
+
 
 @Controller
 //@RestController
 @RequestMapping("/account")
 public class UserController {
-    public static final int EXPIRE_DATE = 300000;
-    private static final String TOKEN_SALT = "HELLO123";
     @Autowired
     UserMapper userMapper;
     @Autowired
     TokenMapper tokenMapper;
 
     @RequestMapping("/home")
-    public String show(HttpServletRequest req){
+    public ModelAndView show(HttpServletRequest req){
         System.out.println("主页");
-
+        ModelAndView mav = new ModelAndView();
         // 获取token的cookie
         Cookie cookie = CookieUtils.getCookie(req.getCookies(),"token");
-        String token = cookie.getValue();
-//        if(verify(token)){
-//
-//        }
-
-
-        return "home";
+        String tokenVal = cookie.getValue();
+        Token token = TokenUtils.verify(tokenVal);
+        if(token!=null){
+            mav.setViewName("home");
+            mav.addObject("id",token.getUserID());
+        }else{
+            mav.setViewName("redirect:loginForm");
+        }
+        return mav;
     }
 
     @RequestMapping("/loginForm")
@@ -68,7 +67,7 @@ public class UserController {
         // 存入token
         if(loginUser!=null){
             // 创建token
-            String tokenValue = createToken(loginUser.getId());
+            String tokenValue = TokenUtils.createToken(loginUser.getId());
             Token token = new Token(loginUser.getId(), tokenValue);
             // 存入数据库
             tokenMapper.insert(token);
@@ -83,24 +82,4 @@ public class UserController {
         }
         return "redirect:home";
     }
-
-    // 创建token
-    public String createToken(int id){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        Date dateAfter = new Date(date.getTime()+EXPIRE_DATE);//5min
-        Object endTime = sdf.format(dateAfter);
-        String msg = "id:"+id+",endTime:"+endTime + ";" + TOKEN_SALT;
-
-        // encode
-        byte[] encodedBytes = Base64.getEncoder().encode(msg.getBytes(StandardCharsets.UTF_8));
-        return new String(encodedBytes);
-    }
-
-    // 验证token
-    public boolean verify(String token){
-
-        return false;
-    }
-
 }

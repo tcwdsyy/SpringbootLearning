@@ -14,6 +14,5 @@
 <h1>hello!</h1>
 <h1>欢迎回来</h1>
     <p>id: ${id}</p>
-    <p>name: ${username}</p>
 </body>
 </html>
