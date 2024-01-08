@@ -20,10 +20,7 @@ import java.text.ParseException;
 
 
 @Controller
-//@RestController
 public class UserController {
-//    @Autowired
-//    UserMapper userMapper;
     @Autowired
     TokenMapper tokenMapper;
     @Autowired

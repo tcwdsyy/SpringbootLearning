@@ -20,7 +20,9 @@ public class UserService {
 
     @Transactional
     public void transfer(int fromID, int toID, int amount) {
+
         userMapper.transfer(-1 * amount, fromID);
+        //System.out.println(1/0);
         userMapper.transfer(amount, toID);
     }
 }

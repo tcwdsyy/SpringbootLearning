@@ -24,28 +24,25 @@ public class LoginInterceptor implements HandlerInterceptor {
         System.out.println("拦截器:");
 
         // 获取token的cookie
-        Cookie cookie = CookieUtils.getCookie(request.getCookies(),"token");
+        Cookie cookie = CookieUtils.getCookie(request.getCookies(), "token");
 
-        if (cookie!=null) {
-            //System.out.println("持有token");
-
+        if (cookie != null) {
             String tokenVal = cookie.getValue();
             Token token = TokenUtils.verify(tokenVal);
 
-            if(token!=null){
+            if (token != null) {
                 // 查看数据库token是否匹配
                 Token loginToken = tokenMapper.selectOne(token);
-//                Token loginToken = token;
-                if (loginToken!=null){
+                if (loginToken != null) {
                     System.out.println("身份验证通过");
-                    request.setAttribute("id",loginToken.getUserID());
+                    request.setAttribute("id", loginToken.getUserID());
                     return true;
-                }else {
+                } else {
                     System.out.println("无法找到token");
                     response.sendRedirect("loginForm");
                     return false;
                 }
-            }else{
+            } else {
                 System.out.println("token不正确");
                 response.sendRedirect("loginForm");
                 return false;
