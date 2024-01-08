@@ -9,7 +9,7 @@ import java.util.Base64;
 import java.util.Date;
 
 public class TokenUtils {
-    public static final int EXPIRE_DATE = 300000;
+    public static final int EXPIRE_DATE = 3600000;
     private static final String TOKEN_SALT = "HELLO123";
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

@@ -4,7 +4,6 @@ import com.syy.springbootlearning.entity.Token;
 import com.syy.springbootlearning.entity.User;
 import com.syy.springbootlearning.mapper.TokenMapper;
 import com.syy.springbootlearning.mapper.UserMapper;
-import com.syy.springbootlearning.utils.CookieUtils;
 import com.syy.springbootlearning.utils.TokenUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +20,6 @@ import java.text.ParseException;
 
 @Controller
 //@RestController
-@RequestMapping("/account")
 public class UserController {
     @Autowired
     UserMapper userMapper;
@@ -31,31 +29,17 @@ public class UserController {
     @RequestMapping("/home")
     public ModelAndView show(HttpServletRequest req,
                              HttpServletResponse resp) throws ParseException {
+        System.out.println("-------------");
         System.out.println("主页:");
+
         ModelAndView mav = new ModelAndView();
 
-        // 获取token的cookie
-        Cookie cookie = CookieUtils.getCookie(req.getCookies(),"token");
-        String tokenVal = cookie.getValue();
-        Token token = TokenUtils.verify(tokenVal);
-
-        if(token!=null){
-            // 查看数据库token是否匹配
-            Token loginToken = tokenMapper.selectOne(token);
-            if (loginToken!=null){
-                // 更新token
-                Token newToken = TokenUtils.createToken(loginToken.getUserID());
-                // 存入数据库
-                tokenMapper.insert(newToken);
-                // 存入客户端Cookie
-                Cookie newCookie = new Cookie("token", newToken.getToken());
-                resp.addCookie(newCookie);
-
-                mav.setViewName("home");
-                mav.addObject("id",loginToken.getUserID());
-            }
+        Integer userID = (Integer) req.getAttribute("id");
+        if(userID!=null){
+            mav.setViewName("home");
+            mav.addObject("id",userID);
         }else{
-            System.out.println("token不正确");
+            System.out.println("找不到User数据");
             mav.setViewName("redirect:loginForm");
         }
         return mav;
@@ -70,6 +54,9 @@ public class UserController {
     public String index(@RequestParam("username") String username,
                         @RequestParam("password") String password,
                         HttpServletResponse resp) throws SQLException {
+        System.out.println("-------------");
+        System.out.println("登录:");
+
         // 验证账户密码
         User user = new User();
         user.setUsername(username);
@@ -93,9 +80,10 @@ public class UserController {
 
             System.out.println("登陆成功");
             System.out.println("生成Token:" + token.getToken());
+            return "redirect:home";
         }else{
             System.out.println("登陆失败");
         }
-        return "redirect:home";
+        return "redirect:loginForm";
     }
 }
