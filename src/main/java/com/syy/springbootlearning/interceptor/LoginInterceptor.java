@@ -37,6 +37,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 Token loginToken = tokenMapper.selectOne(token);
 //                Token loginToken = token;
                 if (loginToken!=null){
+                    System.out.println("身份验证通过");
                     request.setAttribute("id",loginToken.getUserID());
                     return true;
                 }else {

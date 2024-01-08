@@ -31,7 +31,7 @@ public class TokenUtils {
     public static Token verify(String token) throws ParseException {
         byte[] decodedBytes = Base64.getDecoder().decode(token.getBytes(StandardCharsets.UTF_8));
         String str = new String(decodedBytes, StandardCharsets.UTF_8);
-        System.out.println(str);
+        //System.out.println(str);
 
         //将token切割成两部分
         String ahead = str.substring(0, str.indexOf(";"));

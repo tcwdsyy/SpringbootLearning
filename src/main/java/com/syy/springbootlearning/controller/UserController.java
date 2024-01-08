@@ -4,6 +4,7 @@ import com.syy.springbootlearning.entity.Token;
 import com.syy.springbootlearning.entity.User;
 import com.syy.springbootlearning.mapper.TokenMapper;
 import com.syy.springbootlearning.mapper.UserMapper;
+import com.syy.springbootlearning.service.UserService;
 import com.syy.springbootlearning.utils.TokenUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,10 +22,12 @@ import java.text.ParseException;
 @Controller
 //@RestController
 public class UserController {
-    @Autowired
-    UserMapper userMapper;
+//    @Autowired
+//    UserMapper userMapper;
     @Autowired
     TokenMapper tokenMapper;
+    @Autowired
+    UserService userService;
 
     @RequestMapping("/home")
     public ModelAndView show(HttpServletRequest req,
@@ -63,7 +66,7 @@ public class UserController {
         user.setPassword(password);
         User loginUser =null;
         try{
-            loginUser  = userMapper.login(user);
+            loginUser  = userService.login(user);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -78,12 +81,28 @@ public class UserController {
             Cookie cookie = new Cookie("token", token.getToken());
             resp.addCookie(cookie);
 
-            System.out.println("登陆成功");
+            System.out.println("登陆成功:"+ loginUser);
             System.out.println("生成Token:" + token.getToken());
             return "redirect:home";
         }else{
             System.out.println("登陆失败");
         }
         return "redirect:loginForm";
+    }
+
+    @RequestMapping("/transfer")
+    public String transfer(@RequestParam Integer id,
+                           @RequestParam Integer amount,
+                           HttpServletRequest req){
+        System.out.println("-------------");
+        System.out.println("转账:");
+        Integer userID = (Integer) req.getAttribute("id");
+        if(userID!=null){
+            userService.transfer(userID,id,amount);
+            System.out.println("Succeed");
+        }else{
+            System.out.println("Failed");
+        }
+        return "redirect:home";
     }
 }

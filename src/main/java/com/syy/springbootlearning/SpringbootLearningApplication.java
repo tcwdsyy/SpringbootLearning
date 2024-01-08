@@ -7,23 +7,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.handler.MappedInterceptor;
 
 @SpringBootApplication
 @MapperScan("com.syy.springbootlearning.mapper")
 @Configuration
+@EnableTransactionManagement
 public class SpringbootLearningApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SpringbootLearningApplication.class, args);
     }
-
-//    @Bean
-//    public MappedInterceptor loginInterceptor() {
-//        return new MappedInterceptor(new String[]{"/**"}, new String[]{"/account/loginForm","/account/login"}, new LoginInterceptor());
-//    }
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {

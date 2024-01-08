@@ -14,5 +14,18 @@
 <h1>hello!</h1>
 <h1>欢迎回来</h1>
     <p>id: ${id}</p>
+<form class="transferForm" action="transfer">
+    <div>
+        <label for="id">账户ID</label>
+        <input type="text" class="input-text" id="id" name="id" placeholder="请输入用户ID" required/>
+    </div>
+    <div>
+        <label for="amount">金额</label>
+        <input type="text" class="input-text" id="amount" name="amount" placeholder="请输入金额" required/>
+    </div>
+    <div class="submit">
+        <input type="submit" value="转账"/>
+    </div>
+</form>
 </body>
 </html>
