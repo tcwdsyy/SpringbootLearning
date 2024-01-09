@@ -3,7 +3,6 @@ package com.syy.springbootlearning.controller;
 import com.syy.springbootlearning.entity.Token;
 import com.syy.springbootlearning.entity.User;
 import com.syy.springbootlearning.mapper.TokenMapper;
-import com.syy.springbootlearning.mapper.UserMapper;
 import com.syy.springbootlearning.service.UserService;
 import com.syy.springbootlearning.utils.TokenUtils;
 import jakarta.servlet.http.Cookie;
@@ -27,18 +26,17 @@ public class UserController {
     UserService userService;
 
     @RequestMapping("/home")
-    public ModelAndView show(HttpServletRequest req,
-                             HttpServletResponse resp) throws ParseException {
+    public ModelAndView show(HttpServletRequest req) {
         System.out.println("-------------");
         System.out.println("主页:");
 
         ModelAndView mav = new ModelAndView();
 
         Integer userID = (Integer) req.getAttribute("id");
-        if(userID!=null){
+        if (userID != null) {
             mav.setViewName("home");
-            mav.addObject("id",userID);
-        }else{
+            mav.addObject("id", userID);
+        } else {
             System.out.println("找不到User数据");
             mav.setViewName("redirect:loginForm");
         }
@@ -46,14 +44,14 @@ public class UserController {
     }
 
     @RequestMapping("/loginForm")
-    public String loginForm(){
+    public String loginForm() {
         return "login";
     }
 
     @RequestMapping("/login")
     public String index(@RequestParam("username") String username,
                         @RequestParam("password") String password,
-                        HttpServletResponse resp) throws SQLException {
+                        HttpServletResponse resp) {
         System.out.println("-------------");
         System.out.println("登录:");
 
@@ -61,15 +59,15 @@ public class UserController {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
-        User loginUser =null;
-        try{
-            loginUser  = userService.login(user);
-        } catch (SQLException e){
+        User loginUser = null;
+        try {
+            loginUser = userService.login(user);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         // 存入token
-        if(loginUser!=null){
+        if (loginUser != null) {
             // 创建token
             Token token = TokenUtils.createToken(loginUser.getId());
             // 存入数据库
@@ -78,10 +76,10 @@ public class UserController {
             Cookie cookie = new Cookie("token", token.getToken());
             resp.addCookie(cookie);
 
-            System.out.println("登陆成功:"+ loginUser);
+            System.out.println("登陆成功:" + loginUser);
             System.out.println("生成Token:" + token.getToken());
             return "redirect:home";
-        }else{
+        } else {
             System.out.println("登陆失败");
         }
         return "redirect:loginForm";
@@ -90,14 +88,14 @@ public class UserController {
     @RequestMapping("/transfer")
     public String transfer(@RequestParam Integer id,
                            @RequestParam Integer amount,
-                           HttpServletRequest req){
+                           HttpServletRequest req) {
         System.out.println("-------------");
         System.out.println("转账:");
         Integer userID = (Integer) req.getAttribute("id");
-        if(userID!=null){
-            userService.transfer(userID,id,amount);
+        if (userID != null) {
+            userService.transfer(userID, id, amount);
             System.out.println("Succeed");
-        }else{
+        } else {
             System.out.println("Failed");
         }
         return "redirect:home";

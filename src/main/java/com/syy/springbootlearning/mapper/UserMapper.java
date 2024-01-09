@@ -4,7 +4,6 @@ import com.syy.springbootlearning.entity.User;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 
